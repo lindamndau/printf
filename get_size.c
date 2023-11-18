@@ -1,33 +1,31 @@
 #include "main.h"
 
 /**
- * get_size - Calculates the size to cast the argument
- * @format: Formatted string in which to print the arguments
- * @n: List of arguments to be printed.
- *
- * Return: Precision.
+ * get_size - Calculates the size modifier for formatting an argument
+ * @param format: Formatted string in which to print the arguments
+ * @param index: Index of the current character in the format string
+ * @return: Size modifier: Size modifier code (S_SHORT or S_LONG)
  */
-int get_size(const char *format, int *n)
+int get_size(const char *format, int *index)
 {
-	int index = *n + 1;
-	int size = 0;
+    // Initialize size modifier
+    int size = 0;
 
-	if (format[index] == 'l')
-	{
-		size = S_LONG;
-	}
-	else if (format[index] == 'h')
-	{
-		size = S_SHORT;
-	}
+    // Check the next character after the '%'
+    if (format[*index + 1] == 'l') {
+        size = S_LONG;
+    }
+    else if (format[*index + 1] == 'h') {
+        size = S_SHORT;
+    }
 
-	if (size == 0)
-	{
-		*n = index - 1;
-	}
-	else
-	{
-		*n = index;
-	}
-	return (size);
+    // Update the index variable accordingly
+    if (size == 0) {
+        *index = *index - 1;
+    }
+    else {
+        *index = *index + 1;
+    }
+
+    return size;
 }

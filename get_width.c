@@ -1,36 +1,42 @@
 #include "main.h"
+#include <stdarg.h>
 
 /**
- * get_width - Calculates the width for printing
- * @format: Formatted string in which to print the arguments.
- * @i: List of arguments to be printed.
- * @ag: list of arguments.
- * @w - width
- * Return: width.
+ * get_width - Calculates the field width for printing
+ * @param format: Formatted string in which to print the arguments
+ * @param index: Index of the current character in the format string
+ * @param arg_list: List of arguments to be printed
+ * @return: Width: Field width value
  */
-int get_width(const char *format, int *i, va_list ag)
+int get_width(const char *format, int *index, va_list arg_list)
 {
-	int index;
-	int w = 0;
+    // Initialize field width variable
+    int width = 0;
 
-	for (index = *i + 1; format[index] != '\0'; index++)
-	{
-		if (is_digit(format[index]))
-		{
-			w *= 10;
-			w += format[index] - '0';
-		}
-		else if (format[index] == '*')
-		{
-			index++;
-			w = va_arg(ag, int);
-			break;
-		}
-		else
-			break;
-	}
+    // Iterate through the format string starting from the character after the '%'
+    for (int curr_index = *index + 1; format[curr_index] != '\0'; curr_index++) {
+        // Check if the current character is a digit
+        if (isdigit(format[curr_index])) {
+            width *= 10;
+            width += format[curr_index] - '0';
+        }
+        // Check if the current character is an asterisk
+        else if (format[curr_index] == '*') {
+            // Move to the next character
+            curr_index++;
 
-	*i = index - 1;
+            // Extract the width value from the argument list
+            width = va_arg(arg_list, int);
+            break;
+        }
+        // If the character is not a digit or an asterisk, break the loop
+        else {
+            break;
+        }
+    }
 
-	return (w);
+    // Update the index variable with the position of the last processed character
+    *index = curr_index - 1;
+
+    return width;
 }

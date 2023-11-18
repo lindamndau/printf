@@ -1,36 +1,46 @@
 #include "main.h"
 
 /**
- * get_flags - Calculates active flags
- * @format: Formatted string in which to print the arguments
- * @n: take a parameter.
- * Return: Flags:
- */
-int get_flags(const char *format, int *n)
+* get_flags - Calculates active flags
+* @param format: Formatted string in which to print the arguments
+* @param index: Index of the current character in the format string
+* @return: Flags: Active flags
+*/
+int get_flags(const char *format, int *index)
 {
-	/* - + 0 # ' ' */
-	/* 1 2 4 8  16 */
-	int j, index;
-	int flags = 0;
-	const char FLAGS_CH[] = {'-', '+', '0', '#', ' ', '\0'};
-	const int FLAGS_ARR[] = {F_MINUS, F_PLUS, F_ZERO, F_HASH, F_SPACE, 0};
+    /* Character to flag mapping */
+    const char FLAGS_CH[] = {'-', '+', '0', '#', ' ', '\0'};
+    const int FLAGS_ARR[] = {F_MINUS, F_PLUS, F_ZERO, F_HASH, F_SPACE, 0};
 
-	for (index = *n + 1; format[index] != '\0'; index++)
-	{
-		for (j = 0; FLAGS_CH[j] != '\0'; j++)
-			if (format[index] == FLAGS_CH[j])
-			{
-				flags |= FLAGS_ARR[j];
-				break;
-			}
+    int flags = 0;
+    int curr_index = *index + 1;
 
-		if (FLAGS_CH[j] == 0)
-		{
-			break;
-		}
-	}
+    // Iterate through the format string starting from the character after the '%'
+    while (format[curr_index] != '\0')
+    {
+        // Check if the current character is a valid flag character
+        for (int j = 0; FLAGS_CH[j] != '\0'; j++)
+        {
+            if (format[curr_index] == FLAGS_CH[j])
+            {
+                // Set the corresponding flag bit
+                flags |= FLAGS_ARR[j];
+                break;
+            }
+        }
 
-	*n = curr_i - 1;
+        // Exit the loop if no valid flag character was found
+        if (FLAGS_CH[j] == '\0')
+        {
+            break;
+        }
 
-	return (flags);
+        // Move to the next character in the format string
+        curr_index++;
+    }
+
+    // Update the index variable with the position of the last processed character
+    *index = curr_index - 1;
+
+    return flags;
 }

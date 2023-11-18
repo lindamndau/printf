@@ -2,42 +2,48 @@
 
 /**
  * get_precision - Calculates the precision for printing
- * @format: Formatted string in which to print the arguments
- * @i: List of arguments to be printed.
- * @ag: list of arguments.
- *
- * Return: Precision.
+ * @param format: Formatted string in which to print the arguments
+ * @param index: Index of the current character in the format string
+ * @param arg_list: List of arguments to be printed
+ * @return: Precision: Precision value
  */
-int get_precision(const char *format, int *i, va_list ag)
+int get_precision(const char *format, int *index, va_list arg_list)
 {
-	int curr_i = *i + 1;
-	int precision = -1;
+    // Initialize precision variable
+    int precision = -1;
 
-	if (format[curr_i] != '.')
-	{
-		return (precision);
+    // Check if the next character is a dot
+    if (format[*index + 1] != '.') {
+        return precision;
+    }
 
-	}
-	precision = 0;
+    // Set precision to 0
+    precision = 0;
 
-	for (curr_i += 1; format[curr_i] != '\0'; curr_i++)
-	{
-		if (is_digit(format[curr_i]))
-		{
-			precision *= 10;
-			precision += format[curr_i] - '0';
-		}
-		else if (format[curr_i] == '*')
-		{
-			curr_i++;
-			precision = va_arg(ag, int);
-			break;
-		}
-		else
-			break;
-	}
+    // Iterate through the format string starting from the character after the '.'
+    for (int curr_index = *index + 2; format[curr_index] != '\0'; curr_index++) {
+        // Check if the current character is a digit
+        if (isdigit(format[curr_index])) {
+            precision *= 10;
+            precision += format[curr_index] - '0';
+        }
+        // Check if the current character is an asterisk
+        else if (format[curr_index] == '*') {
+            // Move to the next character
+            curr_index++;
 
-	*i = curr_i - 1;
+            // Extract the precision value from the argument list
+            precision = va_arg(arg_list, int);
+            break;
+        }
+        // If the character is not a digit or an asterisk, break the loop
+        else {
+            break;
+        }
+    }
 
-	return (precision);
+    // Update the index variable with the position of the last processed character
+    *index = curr_index - 1;
+
+    return precision;
 }

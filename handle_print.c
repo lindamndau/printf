@@ -1,60 +1,64 @@
 #include "main.h"
-/**
- * handle_print - Prints an argument based on its type
- * @fmt: Formatted string in which to print the arguments.
- * @ag: List of arguments to be printed.
- * @ind: ind.
- * @b: Buffer array to handle print.
- * @flags: Calculates active flags
- * @w: get width.
- * @precision: Precision specification
- * @size: Size specifier
- * Return: 1 or 2;
- */
-int handle_print(const char *fmt, int *ind, va_list ag, char b[],
-	int flags, int w, int precision, int size)
-{
-	int i, len = 0, printed_chars = -1;
-	fmt_t fmt_types[] = {
-		{'c', print_char}, {'s', print_string}, {'%', print_percent},
-		{'i', print_int}, {'d', print_int}, {'b', print_binary},
-		{'u', print_unsigned}, {'o', print_octal}, {'x', print_hexadecimal},
-		{'X', print_hexa_upper}, {'p', print_pointer}, {'S', print_non_printable},
-		{'r', print_reverse}, {'R', print_rot13string}, {'\0', NULL}
-	};
-	for (i = 0; fmt_types[i].fmt != '\0'; i++)
-	{
-		if (fmt[*ind] == fmt_types[i].fmt)
-		{
-			return (fmt_types[i].fn(ag, b, flags, w, precision, size));
-		}
 
-	if (fmt_types[i].fmt == '\0')
-	{
-		if (fmt[*ind] == '\0')
-		{
-			return (-1);
-		}
-		len += write(1, "%%", 1);
-		if (fmt[*ind - 1] == ' ')
-		{
-			len += write(1, " ", 1);
-		}
-		else if (w)
-		{
-			--(*ind);
-			while (fmt[*ind] != ' ' && fmt[*ind] != '%')
-			{
-				--(*ind);
-			}
-			if (fmt[*ind] == ' ')
-			{
-				--(*ind);
-			}
-			return (1);
-		}
-		len += write(1, &fmt[*ind], 1);
-		return (len);
-	}
-	return (printed_chars);
+/**
+ * handle_print - Handles printing an argument based on its type
+ * @param format: Formatted string in which to print the arguments
+ * @param index: Index of the current character in the format string
+ * @param arg_list: List of arguments to be printed
+ * @param buffer: Buffer array to store formatted output
+ * @param flags: Bitmask of active flags (e.g., F_MINUS, F_ZERO)
+ * @param width: Field width
+ * @param precision: Precision value
+ * @param size: Size modifier (e.g., S_SHORT, S_LONG)
+ * @return: Number of characters printed or -1 if an error occurs
+ */
+int handle_print(const char *format, int *index, va_list arg_list, char buffer[],
+                  int flags, int width, int precision, int size)
+{
+    int printed_chars = -1;
+    int unknown_length = 0;
+
+    fmt_t format_types[] = {
+        {'c', print_char}, {'s', print_string}, {'%', print_percent},
+        {'i', print_int}, {'d', print_int}, {'b', print_binary},
+        {'u', print_unsigned}, {'o', print_octal}, {'x', print_hexadecimal},
+        {'X', print_hexa_upper}, {'p', print_pointer}, {'S', print_non_printable},
+        {'r', print_reverse}, {'R', print_rot13string}, {'\0', NULL}
+    };
+
+    for (int i = 0; format_types[i].fmt != '\0'; i++) {
+        if (format[*index] == format_types[i].fmt) {
+            printed_chars = format_types[i].fn(arg_list, buffer, flags, width, precision, size);
+            break;
+        }
+    }
+
+ 
+    if (format_types[i].fmt == '\0') {
+        if (format[*index] == '\0') {
+            return -1;
+        }
+
+        unknown_length += write(1, "%%", 1);
+        if (format[*index - 1] == ' ') {
+            unknown_length += write(1, " ", 1);
+        } else if (width) {
+            --(*index); 
+
+            while (format[*index] != ' ' && format[*index] != '%') {
+                --(*index);
+            }
+
+            if (format[*index] == ' ') {
+                --(*index); 
+            }
+
+            return 1; 
+        }
+
+        unknown_length += write(1, &format[*index], 1);
+        return unknown_length;
+    }
+
+    return printed_chars;
 }
